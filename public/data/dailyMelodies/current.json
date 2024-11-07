@@ -1,9 +1,9 @@
 {
   "melodyParts": [
-    "/assets/audio/dailyMelodies/bar1n1n2n3n1.mp3",
-    "/assets/audio/dailyMelodies/bar2n4n5n6n6.mp3",
-    "/assets/audio/dailyMelodies/bar3n5n3n2n3QLn2QR.mp3",
-    "/assets/audio/dailyMelodies/bar4n1n3n5n8.mp3"
+    "/assets/audio/dailyMelodies/bar1n1n2n3n4.mp3",
+    "/assets/audio/dailyMelodies/bar2n2n3n4n5.mp3",
+    "/assets/audio/dailyMelodies/bar3n3n4QLn5QRn6n5QLn4QR.mp3",
+    "/assets/audio/dailyMelodies/bar4n3n5n7n8.mp3"
   ],
-  "fullTune": "/assets/audio/dailyMelodies/day1tune.mp3"
+  "fullTune": "/assets/audio/dailyMelodies/day2tune.mp3"
 }

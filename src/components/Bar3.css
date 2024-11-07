@@ -3,7 +3,7 @@
   left: 60px;
   width: 270px;
   height: 60px;
-  top: 370px; /* Adjusted from Bar2's 300px */
+  top: 370px;
 }
 
 .bar3 .line {
@@ -14,6 +14,7 @@
   height: 2px;
   background-color: #1174b9;
 }
+
 /* Only increase thickness when bar is active AND in play mode */
 .game-container.play .bar3.active .line {
   height: 4px;
@@ -24,13 +25,38 @@
   width: 60px;
   height: 60px;
   top: 0;
+  transform-style: preserve-3d;
+  perspective: 1000px;
   transform: translateY(-50%);
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease, transform 0.6s;
+}
+
+.bar3 .note-front,
+.bar3 .note-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.bar3 .note-back {
+  transform: rotateY(180deg);
 }
 
 .bar3 .note.visible {
   opacity: 1;
+}
+
+.bar3 .note.flipped {
+  transform: translateY(-50%) rotateY(180deg);
+}
+
+.bar3 .note.clickable {
+  cursor: pointer;
 }
 
 .bar3 .note-image {
@@ -38,11 +64,12 @@
   height: 100%;
   object-fit: contain;
 }
-.note.quaver {
-  width: 30px; /* Half the width of a normal note */
+
+.bar3 .note.quaver {
+  width: 27.6px;
 }
 
-.note.quaver .note-image {
+.bar3 .note.quaver .note-image {
   width: 100%;
   height: 100%;
   object-fit: contain;

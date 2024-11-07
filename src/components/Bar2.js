@@ -1,29 +1,37 @@
-import React from 'react';
+import React, { useState, } from 'react';
 import './Bar2.css';
 
 const Bar2 = ({ isActive, sequence, currentNoteIndex, isBarComplete, isGameComplete, hasFailed }) => {
-  const crotchetPositions = [0, 70, 140, 210];  // Beat positions
+  const [flippedNotes, setFlippedNotes] = useState({});
+  const [flipSound] = useState(new Audio('/assets/audio/ui-sounds/note-flip.mp3'));
+
+  const crotchetPositions = [0, 70, 140, 210];
   const quaverOffsets = {
     left: 5,
     right: 32.6
   };
 
-  const getNotePosition = (note, index, sequence) => {
-    // Calculate which beat this note belongs to
-    let beatIndex = 0;
+  const noteNameMap = {
+    1: 'c',
+    2: 'd',
+    3: 'e',
+    4: 'f',
+    5: 'g',
+    6: 'a',
+    7: 'b',
+    8: 'c8'
+  };
 
-    // Loop through sequence up to current note to determine beat position
+  const getNotePosition = (note, index, sequence) => {
+    let beatIndex = 0;
     for (let i = 0; i < index; i++) {
       if (sequence[i].isQuaverLeft || sequence[i].isQuaverRight) {
-        // Only increment beat after second quaver of the pair
         if (sequence[i].isQuaverRight) beatIndex++;
       } else {
-        // Regular crotchet takes up one beat
         beatIndex++;
       }
     }
 
-    // Handle current note position
     if (note.isQuaverLeft) {
       return crotchetPositions[beatIndex] + quaverOffsets.left;
     }
@@ -33,11 +41,48 @@ const Bar2 = ({ isActive, sequence, currentNoteIndex, isBarComplete, isGameCompl
     return crotchetPositions[beatIndex];
   };
 
-  const getNoteImagePath = (note) => {
-    if (note.isQuaverLeft || note.isQuaverRight) {
-      return `/assets/images/bar-notes/quavers/n${note.fullNote}.svg`;
+  const getNoteImagePath = (note, isFlipped) => {
+    const path = isFlipped ? 
+      (note.isQuaverLeft || note.isQuaverRight) ?
+        `/assets/images/bar-notes/note-namesQ/${noteNameMap[note.number]}Q.svg` :
+        `/assets/images/bar-notes/note-namesC/${noteNameMap[note.number]}.svg`
+      : 
+      (note.isQuaverLeft || note.isQuaverRight) ?
+        `/assets/images/bar-notes/quavers/n${note.fullNote}.svg` :
+        `/assets/images/bar-notes/crochets/n${note.number}.svg`;
+    
+    console.log('Note details:', {
+      isFlipped,
+      noteNumber: note.number,
+      noteName: noteNameMap[note.number],
+      isQuaver: note.isQuaverLeft || note.isQuaverRight,
+      path: path
+    });
+    
+    return path;
+  };
+
+  const handleNoteClick = (index) => {
+    if (isBarComplete || isGameComplete) {
+      console.log('Before flip - flippedNotes state:', flippedNotes);
+      console.log('Clicking note:', {
+        index,
+        currentState: flippedNotes[index],
+        newState: !flippedNotes[index]
+      });
+      
+      flipSound.currentTime = 0;
+      flipSound.play().catch(error => console.log('Audio play failed:', error));
+      
+      setFlippedNotes(prev => {
+        const newState = {
+          ...prev,
+          [index]: !prev[index]
+        };
+        console.log('After flip - new flippedNotes state:', newState);
+        return newState;
+      });
     }
-    return `/assets/images/bar-notes/crochets/n${note.number}.svg`;
   };
 
   return (
@@ -64,18 +109,32 @@ const Bar2 = ({ isActive, sequence, currentNoteIndex, isBarComplete, isGameCompl
         sequence && sequence.map((note, index) => (
           <div
             key={index}
-            className={`note ${index < currentNoteIndex || isBarComplete || isGameComplete ? 'visible' : ''} 
-                     ${note.isQuaverLeft || note.isQuaverRight ? 'quaver' : 'crotchet'}`}
+            onClick={() => handleNoteClick(index)}
+            className={`note 
+              ${index < currentNoteIndex || isBarComplete || isGameComplete ? 'visible' : ''} 
+              ${note.isQuaverLeft || note.isQuaverRight ? 'quaver' : 'crotchet'}
+              ${flippedNotes[index] ? 'flipped' : ''}
+              ${(isBarComplete || isGameComplete) ? 'clickable' : ''}`
+            }
             style={{ 
               left: `${getNotePosition(note, index, sequence)}px`,
               width: note.isQuaverLeft || note.isQuaverRight ? '27.6px' : '60px'
             }}
           >
-            <img 
-              src={getNoteImagePath(note)}
-              alt={`Note ${note.fullNote || note.number}`}
-              className="note-image"
-            />
+            <div className="note-front">
+              <img 
+                src={getNoteImagePath(note, false)}
+                alt={`Note ${note.fullNote || note.number}`}
+                className="note-image"
+              />
+            </div>
+            <div className="note-back">
+              <img 
+                src={getNoteImagePath(note, true)}
+                alt={`Note name ${noteNameMap[note.number]}`}
+                className="note-image"
+              />
+            </div>
           </div>
         ))
       )}
