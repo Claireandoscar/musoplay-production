@@ -1,14 +1,17 @@
 import React from 'react';
 import './TestButton.css';
 
-function TestButton({ onClick, isDisabled }) {
+function TestButton({ onClick, isDisabled, isTestMode }) {  // Added isTestMode prop
   return (
     <button 
-      className={`test-button ${isDisabled ? 'disabled' : ''}`} 
+      className={`test-button ${isDisabled ? 'disabled' : ''} ${isTestMode ? 'active' : ''}`}
       onClick={onClick}
       disabled={isDisabled}
     >
-      <img src="/assets/images/ui/test.svg" alt="Test" />
+      <img 
+        src={isTestMode ? "/assets/images/ui/test-active.svg" : "/assets/images/ui/test.svg"} 
+        alt={isTestMode ? "Exit Test Mode" : "Enter Test Mode"} 
+      />
     </button>
   );
 }

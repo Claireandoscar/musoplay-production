@@ -4,6 +4,15 @@ import './StartScreen.css';
 const StartScreen = ({ onStartGame }) => {
   const [showInstructions, setShowInstructions] = useState(false);
 
+  const handleTodaysGameClick = () => {
+    setShowInstructions(true);
+  };
+
+  const handleCloseInstructions = () => {
+    setShowInstructions(false);
+    onStartGame();
+  };
+
   return (
     <div className="start-screen">
       <img 
@@ -12,18 +21,18 @@ const StartScreen = ({ onStartGame }) => {
         className="logo"
       />
       <div className="tagline">THE DAILY PUZZLE GAME</div>
-      <button className="start-button" onClick={onStartGame}>
+      <button className="start-button" onClick={handleTodaysGameClick}>
         <img src="/assets/images/ui/n7.svg" alt="Start Game" />
-        <span>TODAY'S GAME</span>
+        <span>TODAY'S MUSOPLAY</span>
       </button>
-      <button className="instructions-button" onClick={() => setShowInstructions(true)}>
-        <img src="/assets/images/ui/n5.svg" alt="Instructions" />
-        <span>LEARN MORE</span>
+      <button className="instructions-button" onClick={() => setShowInstructions(false)}>
+        <img src="/assets/images/ui/n5.svg" alt="Trivia" />
+        <span>DAILY MUSOPLAY TRIVIA</span>
       </button>
 
       {showInstructions && (
         <div className="instructions-popup">
-          <button className="close-button" onClick={() => setShowInstructions(false)}>
+          <button className="close-button" onClick={handleCloseInstructions}>
             ×
           </button>
           <div className="instructions-content">
