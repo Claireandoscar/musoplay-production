@@ -139,10 +139,10 @@
   font-size: 24px;
   line-height: 1.2;
   position: absolute;
-  bottom: 80px;
+  bottom: 80px; /* Position above the logo */
   left: 0;
   right: 0;
-  padding: 0 20px;
+  padding: 0 20px; /* Add some padding on the sides for very narrow screens */
 }
 
 .typed-message p {
@@ -151,54 +151,7 @@
 
 @media (max-height: 600px) {
   .typed-message {
-    bottom: 60px;
+    bottom: 60px; /* Adjust for smaller screens */
     font-size: 16px;
   }
-}
-
-/* Social icons container - this is important */
-.social-icons {
-  display: flex;
-  justify-content: center;
-  align-items: center; /* Add this */
-  gap: 25px;
-  margin-top: 15px;
-  width: 100%;
-  position: relative; /* Add this */
-  z-index: 2; /* Add this */
-}
-
-.social-icon-button.next {
-  background: none;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: block;
-  margin: 0 auto;
-  padding: 0; /* Add this */
-  animation: pulse 2s infinite;
-}
-
-.next-icon {
-  width: 150px;
-  height: 75px;
-  display: block;
-  pointer-events: none; /* Add this */
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.social-icon-button.next:hover {
-  transform: scale(1.1);
-  animation: none;
 }

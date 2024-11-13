@@ -6,20 +6,12 @@ import VirtualInstrument from './components/VirtualInstrument';
 import ProgressBar from './components/ProgressBar';
 import EndGameAnimation from './components/EndGameAnimation';
 import StartScreen from './components/StartScreen';
-import TestWelcomeScreen from './components/TestWelcomeScreen';
+
 
 function App() {
-  const [isSurveyMode] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    return Boolean(params.get('testId'));
-});
-const [surveyGameNumber, setSurveyGameNumber] = useState(() => {
-  const params = new URLSearchParams(window.location.search);
-  return parseInt(params.get('gameNumber')) || 0;
-});
-const [showSurveyWelcome, setShowSurveyWelcome] = useState(() => {
-  return isSurveyMode && surveyGameNumber === 0;
-});
+  const [testGameNumber, setTestGameNumber] = useState(() => {
+    return parseInt(localStorage.getItem('currentGame')) || 1;
+  });
   const [audioFiles, setAudioFiles] = useState([]);
   const [fullTunePath, setFullTunePath] = useState('');
   const [fullTuneAudio, setFullTuneAudio] = useState(null);
@@ -46,7 +38,7 @@ const [showSurveyWelcome, setShowSurveyWelcome] = useState(() => {
   const [audioContext, setAudioContext] = useState(null);
   const [isBarFailing, setIsBarFailing] = useState(false);
   const [failedBars, setFailedBars] = useState([false, false, false, false]);
-
+ 
   const initializeAudioContext = useCallback(() => {
     if (!audioContext) {
       const newAudioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -70,7 +62,8 @@ const [showSurveyWelcome, setShowSurveyWelcome] = useState(() => {
   useEffect(() => {
     const fetchAudioFiles = async () => {
       try {
-        const response = await fetch('/data/dailyMelodies/current.json');
+        const jsonPath = '/data/dailyMelodies/current.json';
+        const response = await fetch(jsonPath);
         const data = await response.json();
         setAudioFiles(data.melodyParts);
         setFullTunePath(data.fullTune);
@@ -78,9 +71,9 @@ const [showSurveyWelcome, setShowSurveyWelcome] = useState(() => {
         console.error('Failed to load current.json:', error);
       }
     };
-
+  
     fetchAudioFiles();
-  }, []);
+  }, [testGameNumber]); // Add testGameNumber as dependency
 
   useEffect(() => {
     async function loadFullTune() {
@@ -219,10 +212,6 @@ const [showSurveyWelcome, setShowSurveyWelcome] = useState(() => {
     }
   }, [isTestMode, isGameStarted, playCurrentBarAudio]);
 
-  const handleStartSurvey = () => {
-    // Redirect to screening survey
-    window.location.href = 'https://www.surveymonkey.com/r/musoplay1';
-};
   const moveToNextBar = useCallback((isSuccess = true) => {
     setCompletedBars(prevCompletedBars => {
       const newCompletedBars = [...prevCompletedBars];
@@ -373,11 +362,7 @@ const renderBar = useCallback((BarComponent, index) => {
       setShowEndAnimation(false);
     });
   };
-
-  if (showSurveyWelcome) {
-    return <TestWelcomeScreen onStartTest={() => handleStartSurvey()} />;
-}
-
+  
   if (showStartScreen) {
     return (
       <div className="game-wrapper">
@@ -387,47 +372,41 @@ const renderBar = useCallback((BarComponent, index) => {
       </div>
     );
   }
-
-  // At the end of your App.js, fix the closing tags and add missing closing brackets:
-  const testId = new URLSearchParams(window.location.search).get('testId');
-  console.log('testId from URL:', testId);
-  console.log('isSurveyMode value:', Boolean(testId));
-return (
-  <div className="game-wrapper">
-    <div className={`game-container ${gameMode}`}>
-      <GameBoard 
-        barHearts={barHearts} 
-        currentBarIndex={currentBarIndex} 
-        renderBar={renderBar}
-        isBarFailed={isBarFailing}
-      />
-      <Controls 
-        onTest={handleTest}
-        onPlay={handlePlay}
-        isTestMode={isTestMode}
-        isTestButtonAvailable={isTestButtonAvailable}
-        currentBarIndex={currentBarIndex}
-        isAudioLoaded={!!currentBarAudio}
-        isPlayButtonAnimated={isPlayButtonAnimated}
-      />
-      <VirtualInstrument 
-        notes={notes}
-        isFlipped={isFlipped}
-        onNotePlay={handleNotePlay}
-        isGameEnded={isGameEnded}
-        isBarFailing={isBarFailing}
-      />
-      <ProgressBar completedBars={completedBars.filter(Boolean).length} />
-      {showEndAnimation && (
-        <EndGameAnimation 
-          score={score} 
+  
+  return (
+    <div className="game-wrapper">
+      <div className={`game-container ${gameMode}`}>
+        <GameBoard 
           barHearts={barHearts} 
-          isSurveyMode={Boolean(new URLSearchParams(window.location.search).get('testId'))}
+          currentBarIndex={currentBarIndex} 
+          renderBar={renderBar}
+          isBarFailed={isBarFailing}
         />
-      )}
+        <Controls 
+          onTest={handleTest}
+          onPlay={handlePlay}
+          isTestMode={isTestMode}
+          isTestButtonAvailable={isTestButtonAvailable}
+          currentBarIndex={currentBarIndex}
+          isAudioLoaded={!!currentBarAudio}
+          isPlayButtonAnimated={isPlayButtonAnimated}
+        />
+        <VirtualInstrument 
+          notes={notes}
+          isFlipped={isFlipped}
+          onNotePlay={handleNotePlay}
+          isGameEnded={isGameEnded}
+          isBarFailing={isBarFailing}
+        />
+        <ProgressBar completedBars={completedBars.filter(Boolean).length} />
+        {showEndAnimation && (
+          <EndGameAnimation 
+            score={score} 
+            barHearts={barHearts} 
+          />
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
 }
-
 export default App;
